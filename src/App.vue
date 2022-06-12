@@ -1,81 +1,128 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div class="menu">
+    <div class="btns-menu">
+      <button
+      @click="addSection"
+      >Создать страницу</button>
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <div class="sections">
+      <div class="section"
+      v-for="section in sections"
+      :key="section.id">
+        <div class="section__content" contenteditable="false" >
+          <div class="section__icon">
+            <img v-bind:src="section.icon" v-if="section.icon.length>0" alt="">
+          </div >
+        {{section.name}}
+        </div>
+        <img src="cogwheel.svg" class="section__cogwheel">
+        <img
+        @click="removeSection(section.id)"
+         src="trashbin.svg" class="section__trashbin">
+      </div>
+    </div>
+  </div> 
 </template>
 
+<script>
+export default {
+  name: 'App',
+  data () {
+    return {
+      sections: [
+        {
+          id:1,
+          icon: 'favicon.ico',
+          name: 'example',
+        },
+        {
+          id:2,
+          icon: 'favicon.ico',
+          name: 'example2',
+        },
+
+      ] 
+    }
+  },
+  methods: {
+    removeSection(id){
+      this.sections = this.sections.filter(el => el.id != id)
+    },
+    addSection(){
+      if (this.sections.length > 0)
+        this.sections.push({
+          id:this.sections[this.sections.length-1].id + 1,
+          icon:'',
+          name:'new',
+        }) 
+      else
+        this.sections.push({
+        id:0,
+        icon:'',
+        name:'new',
+      })
+
+    }
+  },
+}
+</script>
+
 <style>
-@import './assets/base.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
-}
-
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+  * {
+    margin: 0;  
+    padding: 0;
+    box-sizing: border-box;
   }
-}
+  .section__icon{
 
-@media (min-width: 1024px) {
-  body {
+  }
+  .menu {
+    max-width: 300px;
+    height: 100vh;
+    background: #191919;
+  }
+  .sections {
     display: flex;
-    place-items: center;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .section__icon {
+    height: 14px;
+    width: 14px;
+  }
+  .section__icon img {
+    width: 100%;
+    height: 100%;
   }
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
+  .section {
+    color: white;
     display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+    align-items: center;
+    gap: 10px;
+    height: 30px;
+    margin-left: 10px;
 
-  header .wrapper {
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
+
+    /* identical to box height */
+
+    color: #FFFFFF;
+  }
+  .section__content {
     display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+    width: 155px;
+    height: 30px;
 
-  .logo {
-    margin: 0 2rem 0 0;
   }
-}
+  .section:hover .section__content{
+    background: #2A2A2A;
+  }
 </style>
