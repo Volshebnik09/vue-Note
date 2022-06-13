@@ -1,128 +1,268 @@
 <template>
   <div class="menu">
-    <div class="btns-menu">
-      <button
-      @click="addSection"
-      >Создать страницу</button>
+    <div class="top">
+      <menu__sections 
+        :sections="sections"
+        :sectionSelected="sectionSelected"
+        @selectSection="selectSection"
+        @removeSection="removeSection"
+        @saveNameSection="saveNameSection"
+        @addSection="addSection"
+        @sectionEditAllow="sectionEditAllow"
+        @applySectionChanges="applySectionChanges"
+        @denySectionChanges="denySectionChanges"
+      />
+      <button class="btn-add-page"
+        @click="addSection"
+        >+
+      </button>
+      
     </div>
-    <div class="sections">
-      <div class="section"
-      v-for="section in sections"
-      :key="section.id">
-        <div class="section__content" contenteditable="false" >
-          <div class="section__icon">
-            <img v-bind:src="section.icon" v-if="section.icon.length>0" alt="">
-          </div >
-        {{section.name}}
-        </div>
-        <img src="cogwheel.svg" class="section__cogwheel">
-        <img
-        @click="removeSection(section.id)"
-         src="trashbin.svg" class="section__trashbin">
-      </div>
+    <div class="menu__contacts">
+      <a href="https://github.com/Volshebnik09">
+        <img src="@/img/github.svg" alt="">
+        GitHub
+      </a>
+      <a href="https://github.com/Volshebnik09/vue-Note">
+        <img src="@/img/github.svg" alt="">
+        Repository
+      </a>
+      <a href="https://github.com/Volshebnik09">
+        <img src="@/img/github.svg" alt="">
+        Main site
+      </a>
     </div>
   </div> 
+  <screen
+  :sections="sections"
+  :sectionSelected="sectionSelected"
+  @saveNameSection="saveNameSection"
+  @saveLines="saveLines"
+
+  />
 </template>
 
 <script>
+var shiftDown = false;
+var setShiftDown = function(event){
+    if(event.keyCode === 16 || event.charCode === 16){
+        window.shiftDown = true;
+    }
+};
+
+var setShiftUp = function(event){
+    if(event.keyCode === 16 || event.charCode === 16){
+        window.shiftDown = false;
+    }
+};
+
+window.addEventListener? document.addEventListener('keydown', setShiftDown) : document.attachEvent('keydown', setShiftDown);
+window.addEventListener? document.addEventListener('keyup', setShiftUp) : document.attachEvent('keyup', setShiftUp);
+import menu__sections from "@/components/menu__sections.vue"
+import screen from "@/components/screen.vue"
+
 export default {
   name: 'App',
+  components: {
+    menu__sections,screen
+  },
+
   data () {
     return {
       sections: [
-        {
-          id:1,
-          icon: 'favicon.ico',
-          name: 'example',
-        },
-        {
-          id:2,
-          icon: 'favicon.ico',
-          name: 'example2',
-        },
-
-      ] 
+        // {
+        //   id:1,
+        //   icon: 'favicon.ico',
+        //   name: 'example',
+        //   contenteditable: false,
+        // },
+      ],
+      sectionSelected: 1
     }
   },
+
   methods: {
+
     removeSection(id){
       this.sections = this.sections.filter(el => el.id != id)
+      localStorage.sections = JSON.stringify(this.sections)
+
     },
+
+    saveNameSection(event = 0, id, from = ''){
+      if (!window.shiftDown) {  
+        if (from) {
+
+          if (from.textContent.length > 0)
+            this.sections.map((el)=>{if (el.id === id) el.name = from.textContent})
+          else
+            this.sections.map((el)=>{if (el.id === id) el.name = "empty name"})
+        console.log(this.sections)
+          return
+        } 
+        if (event.target.textContent.length > 0)
+          this.sections.map((el)=>{if (el.id === id) el.name = event.target.textContent})
+        else
+          this.sections.map((el)=>{if (el.id === id) el.name = "empty name"})
+        event.target.blur()
+        this.sections.map((el)=>{if (el.id === id) el.contenteditable = false } )
+        console.log(this.sections)
+        localStorage.sections = JSON.stringify(this.sections)
+      }
+    },
+
     addSection(){
       if (this.sections.length > 0)
         this.sections.push({
           id:this.sections[this.sections.length-1].id + 1,
-          icon:'',
-          name:'new',
+          icon:'favicon.ico',
+          name:'new section',
         }) 
       else
         this.sections.push({
         id:0,
-        icon:'',
-        name:'new',
+        icon:'favicon.ico',
+        name:'new section',
       })
+      setTimeout(()=>{
+        document.querySelector('.menu > .top').scrollTop= document.querySelector('.menu > .top').scrollHeight
+      },4)
+      localStorage.sections = JSON.stringify(this.sections)
+    },
+
+    sectionEditAllow(id){
+      this.sections.map((el)=>{if (el.id === id) el.prevName = el.name})
+      this.sections.map((el)=>{(el.id === id)? el.contenteditable = true: el.contenteditable = false } )
+    },
+
+    applySectionChanges(event, id){
+
+      this.saveNameSection(event,id,event.target.parentNode.childNodes[0].childNodes[1])
+      this.sections.map((el)=>{if (el.id === id) el.contenteditable = false} )
+    },
+
+    denySectionChanges(event, id){
+
+      this.sections.map((el)=>{if (el.id === id) {
+        el.name = el.prevName
+        delete el.prevName;
+        event.target.parentNode.childNodes[0].childNodes[1].textContent= el.name
+      }})
+
+
+      this.sections.map((el)=>{if (el.id === id) el.contenteditable = false} )
+      console.log(this.sections)
+    },
+    selectSection(id){
+      this.sectionSelected = id
+    },
+    saveLines(lines, id){
+       this.sections.map((el)=>{
+        if (el.id === id) 
+          el.lines = lines
+       })
+        localStorage.sections = JSON.stringify(this.sections)
 
     }
+  },
+
+  mounted() {
+    if (localStorage.sections){
+      this.sections = JSON.parse(localStorage.sections)
+      if (this.sections.length < 1) {
+        this.sections.push({
+          id:1,
+          icon: 'favicon.ico',
+          name: 'Example page',
+          lines: [
+          'Ты можешь писать здесь что угодно',
+          'Чтобы добавить новую секцию нажми на + в боковом меню',
+          'Сохранение происходит когда ты выходишь из редактируемого поля',
+          '<br> В будущем можно будет: <br> 1) Создавать разделитель <br> 2) Использовать различные стили для блоков текста <br> 3) Изменять иконки секций <br> 4) Адаптивность ','<br> Ты можешь удалить эту страницу, чтобы увидеть её снова удали все существующие страницы'],
+          contenteditable: false,
+        })
+      }
+    }
+    // if (localStorage.sectionSelected){
+    //   this.sectionSelected = localStorage.sectionSelected
+    // } else {
+    //   this.sectionSelected = this.sections[0].id
+    //   console.log(this.sectionSelected)
+    // }
   },
 }
 </script>
 
 <style>
+  html {
+    overflow: hidden;
+  }
+  #app {
+    display: flex;
+  }
+  
+  img {
+    user-select: none;
+  }
   * {
     margin: 0;  
     padding: 0;
     box-sizing: border-box;
   }
-  .section__icon{
+  .menu > .top {
+    margin-top: 10px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
 
   }
   .menu {
-    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 300px;
     height: 100vh;
     background: #191919;
   }
-  .sections {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .section__icon {
-    height: 14px;
-    width: 14px;
-  }
-  .section__icon img {
-    width: 100%;
-    height: 100%;
-  }
-
-  .section {
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .btn-add-page {
+    cursor: pointer;
+    display: block;
+    background: white;
+    outline: none;
+    border: none;
+    margin: 10px 0 0 10px;
+    width: 30px;
     height: 30px;
-    margin-left: 10px;
-
-    font-family: 'Montserrat';
+    line-height: 0px;
+    font-size: 30px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    transition: 0.1s;
+    margin-bottom: 20px;
+  }
+  .btn-add-page:hover {
+    transform: scale(0.96);
+  }
+  .menu__contacts{
+    border-top: 2px solid white;
+    margin: 10px;
+    padding-top: 10px;
+    flex-direction: column;
+    gap: 10px;
+    display: flex;
+  }
+  .menu__contacts a {
+        font-family: 'Montserrat';
     font-style: normal;
     font-weight: 500;
     font-size: 18px;
     line-height: 22px;
-
+    width: fit-content;
     /* identical to box height */
 
     color: #FFFFFF;
-  }
-  .section__content {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 8px;
-    width: 155px;
-    height: 30px;
-
-  }
-  .section:hover .section__content{
-    background: #2A2A2A;
+    gap: 20px;
+    text-decoration: none;
   }
 </style>
