@@ -20,15 +20,15 @@
     </div>
     <div class="menu__contacts">
       <a href="https://github.com/Volshebnik09">
-        <img src="@/img/github.svg" alt="">
+        <img :src="img['github']" alt="">
         GitHub
       </a>
       <a href="https://github.com/Volshebnik09/vue-Note">
-        <img src="@/img/github.svg" alt="">
+        <img :src="img['github']" alt="">
         Repository
       </a>
       <a href="https://github.com/Volshebnik09">
-        <img src="@/img/github.svg" alt="">
+        <img :src="img['github']" alt="">
         Main site
       </a>
     </div>
@@ -60,6 +60,8 @@ window.addEventListener? document.addEventListener('keydown', setShiftDown) : do
 window.addEventListener? document.addEventListener('keyup', setShiftUp) : document.attachEvent('keyup', setShiftUp);
 import menu__sections from "@/components/menu__sections.vue"
 import screen from "@/components/screen.vue"
+import github from "@/img/github.svg"
+
 
 export default {
   name: 'App',
@@ -69,6 +71,9 @@ export default {
 
   data () {
     return {
+      img: {
+        github:github
+      },
       sections: [
         // {
         //   id:1,
@@ -115,13 +120,13 @@ export default {
       if (this.sections.length > 0)
         this.sections.push({
           id:this.sections[this.sections.length-1].id + 1,
-          icon:'favicon.ico',
+          icon:'favicon',
           name:'new section',
         }) 
       else
         this.sections.push({
         id:0,
-        icon:'favicon.ico',
+        icon:'favicon',
         name:'new section',
       })
       setTimeout(()=>{
@@ -172,7 +177,7 @@ export default {
       if (this.sections.length < 1) {
         this.sections.push({
           id:1,
-          icon: 'favicon.ico',
+          icon: 'favicon',
           name: 'Example page',
           lines: [
           'Ты можешь писать здесь что угодно',

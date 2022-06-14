@@ -6,7 +6,7 @@
 	    	<div class="screen__top">
 	        	<img 
 	        		class="screen__top__icon" 
-			        v-bind:src="sections.filter(el => el.id == sectionSelected)[0].icon" 
+			        v-bind:src="img[sections.filter(el => el.id == sectionSelected)[0].icon]" 
 			        alt="">
 			    <div 
 			    	class="screen__top__title" 
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import favicon from "@/img/favicon.ico"
 
 export default {
   props:{
@@ -51,6 +52,9 @@ export default {
 
   data () {
     return {
+    	img:{
+    		favicon:favicon
+    	}
     }
   },
 

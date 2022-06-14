@@ -10,7 +10,7 @@
           <div class="section__icon">
             <img  
         	draggable="false" ondragstart="return false;"
-            v-bind:src="section.icon" 
+            :src="img[section.icon]" 
             v-if="section.icon.length>0" alt="">
           </div>
           <div 
@@ -25,29 +25,35 @@
         	draggable="false" ondragstart="return false;"
         	v-if="!section.contenteditable"
         	@click="sectionEditAllow(section.id)"
-        	src="@/img/cogwheel.svg" class="section__cogwheel">
+        	:src="img['cogwheel']" class="section__cogwheel">
         <img
         	draggable="false" ondragstart="return false;"
         	v-if="!section.contenteditable"
 	        @click="removeSection(section.id)"
-	         src="@/img/trashbin.svg" class="section__trashbin">
+	         :src="img['trashbin']" class="section__trashbin">
         <img
         	draggable="false" ondragstart="return false;"
         	v-if="section.contenteditable"
         	@click="applySectionChanges($event, section.id)"
-        	src="@/img/ok.svg" class="section__ok">
+        	:src="img['ok']" class="section__ok">
         <img
         	draggable="false" ondragstart="return false;"
         	v-if="section.contenteditable"
 	        @click="denySectionChanges($event, section.id)"
-	        src="@/img/cancel.svg" class="section__cancel">
+	        :src="img['cancel']" class="section__cancel">
       </div>
     </div>
 </template>
 
 <script>
-export default {
+import cogwheel from "@/img/cogwheel.svg"
+import trashbin from "@/img/trashbin.svg"
+import ok from "@/img/ok.svg"
+import cancel from "@/img/ok.svg"
+import favicon from "@/img/favicon.ico"
 
+export default {
+  
   name: 'menu__sections',
   props: {
   	sections: {},
@@ -55,7 +61,13 @@ export default {
   },
   data () {
     return {
-
+      img:{
+    cogwheel:cogwheel,
+    trashbin:trashbin,
+    ok:ok,
+    cancel:cancel,
+    favicon:favicon
+  },
     }
   },
   methods: {
